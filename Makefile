@@ -1,5 +1,6 @@
 VENV_FOLDER := venv
 PYTHON_BIN := ./venv/bin/python
+COVERAGE_BIN := ./venv/bin/coverage
 ASYNC_SERVER := uvicorn
 APP_PATH := poc.application:app
 
@@ -39,4 +40,9 @@ add_dep:
 	$(PYTHON_BIN) -m pip install $(PACKAGES)
 
 test:
-	$(PYTHON_BIN) -m pytest ./
+	$(COVERAGE_BIN) run -m pytest ./
+	$(COVERAGE_BIN) report
+
+report:
+	$(COVERAGE_BIN) run -m pytest ./
+	$(COVERAGE_BIN) html
