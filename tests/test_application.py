@@ -52,3 +52,10 @@ def test_invalid_login():
 
     assert response.status_code == 403
     assert response.json().get('detail') == 'Invalid username/password'
+
+    auth_payload["username"] = "test"
+
+    response = client.post("/login", json=auth_payload)
+
+    assert response.status_code == 403
+    assert response.json().get('detail') == 'Invalid username/password'
