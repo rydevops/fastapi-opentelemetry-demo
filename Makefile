@@ -1,8 +1,11 @@
 VENV_FOLDER := venv
 PYTHON_BIN := ./venv/bin/python
+OTEL_BIN := ./venv/bin/opentelemetry-instrument
+UVICORN_BIN := ./venv/bin/uvicorn
 COVERAGE_BIN := ./venv/bin/coverage
-ASYNC_SERVER := uvicorn
 APP_PATH := poc.application:app
+LISTEN_ADDR := 0.0.0.0
+UVICORN_WORKERS := 1
 
 all: _clear_screen init
 
@@ -34,7 +37,7 @@ freeze:
 	$(PYTHON_BIN) -m pip freeze > requirements.txt
 
 run: _clear_screen
-	$(PYTHON_BIN) -m $(ASYNC_SERVER) $(APP_PATH) --reload
+	$(OTEL_BIN) --traces_exporter=console --log_level=debug --metrics_exporter=console $(UVICORN_BIN) $(APP_PATH) --host=$(LISTEN_ADDR) --workers=$(UVICORN_WORKERS)
 
 add_dep:
 	$(PYTHON_BIN) -m pip install $(PACKAGES)
