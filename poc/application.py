@@ -1,9 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import jwt
+from opentelemetry import trace, metrics
 
 import random
 import string
+
+tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+root_counter = meter.create_counter("root_counter", description="Number of root requests")
 
 app = FastAPI()
 jwt_secret = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation) for i in range(32))
@@ -14,7 +19,11 @@ class Credentials(BaseModel):
 
 @app.get("/")
 async def read_root():
-    return {"Hello": "World"}
+    # Adding additional attributes to a child span
+    with tracer.start_as_current_span("root") as root_span:
+        root_span.set_attribute("root.value", "test")
+        root_counter.add(1)
+        return {"Hello": "World"}
 
 @app.get("/items/{item_id}")
 async def get_item(item_id: int):
